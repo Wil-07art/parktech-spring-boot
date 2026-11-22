@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkTech · Gestión de Parqueadero</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ===================== VISTA DE LOGIN ===================== -->
+<section id="vista-login" class="login-wrapper">
+    <form id="form-login" class="login-card" autocomplete="off">
+        <div class="brand brand-login">
+            <span class="brand-logo">P</span>
+            <span class="brand-name">Park<strong>Tech</strong></span>
+        </div>
+        <p class="texto-secundario">Inicia sesión para operar la caseta</p>
+
+        <label for="login-usuario">Usuario</label>
+        <input id="login-usuario" type="text" placeholder="admin u operario1" required>
+
+        <label for="login-password">Contraseña</label>
+        <input id="login-password" type="password" placeholder="••••••" required>
+
+        <button type="submit" class="btn btn-primario btn-bloque">Ingresar</button>
+    </form>
+</section>
+
+<!-- ===================== APLICACIÓN PRINCIPAL ===================== -->
+<div id="vista-app" class="oculto">
+
+    <!-- Barra superior con marca, pestañas, reloj y usuario -->
+    <header class="topbar">
+        <div class="brand">
+            <span class="brand-logo">P</span>
+            <span class="brand-name">Park<strong>Tech</strong></span>
+        </div>
+
+        <nav class="tabs">
+            <button class="tab activa" data-panel="panel-ingreso">Ingreso</button>
+            <button class="tab" data-panel="panel-salida">Salida y Cobro</button>
+            <button class="tab solo-admin" data-panel="panel-caja">Consolidado de Caja</button>
+        </nav>
+
+        <div class="topbar-derecha">
+            <span id="reloj" class="mono reloj">--:--:--</span>
+            <span class="usuario-info">
+                <span id="usuario-nombre"></span>
+                <span id="usuario-rol" class="badge"></span>
+            </span>
+            <button id="btn-salir" class="btn btn-fantasma">Salir</button>
+        </div>
+    </header>
+
+    <main class="contenido">
+
+        <!-- ============ P-01: PANEL DE INGRESO ============ -->
+        <section id="panel-ingreso" class="panel">
+            <div class="grid-2">
+                <form id="form-ingreso" class="card">
+                    <h2>Registrar ingreso</h2>
+                    <p class="texto-secundario">La hora se toma del servidor al registrar.</p>
+
+                    <label for="ingreso-placa">Placa</label>
+                    <input id="ingreso-placa" class="input-placa mono" type="text" maxlength="7"
+                           placeholder="ABC-123" autocomplete="off" required>
+                    <small class="texto-secundario">Carro: ABC-123 · Moto: ABC-12D o ABC-123</small>
+
+                    <label>Tipo de vehículo</label>
+                    <div class="selector-tipo">
+                        <label class="opcion-tipo">
+                            <input type="radio" name="tipo" value="CARRO" checked>
+                            <span>Carro</span>
+                        </label>
+                        <label class="opcion-tipo">
+                            <input type="radio" name="tipo" value="MOTO">
+                            <span>Moto</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primario btn-bloque">Registrar ingreso ⏎</button>
+                </form>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Vehículos adentro</h2>
+                        <span id="contador-adentro" class="badge">0</span>
+                    </div>
+                    <div class="tabla-scroll">
+                        <table>
+                            <thead>
+                            <tr><th>Placa</th><th>Tipo</th><th>Ingreso</th><th>Tiempo</th><th>Operario</th></tr>
+                            </thead>
+                            <tbody id="tabla-adentro">
+                            <tr><td colspan="5" class="vacio">Sin vehículos adentro</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ P-02: PANEL DE SALIDA Y COBRO ============ -->
+        <section id="panel-salida" class="panel oculto">
+            <div class="grid-2">
+                <form id="form-consulta" class="card">
+                    <h2>Buscar vehículo</h2>
+                    <p class="texto-secundario">Escribe la placa y presiona Enter para liquidar.</p>
+
+                    <label for="salida-placa">Placa</label>
+                    <input id="salida-placa" class="input-placa mono" type="text" maxlength="7"
+                           placeholder="ABC-123" autocomplete="off" required>
+
+                    <button type="submit" class="btn btn-primario btn-bloque">Calcular cobro ⏎</button>
+                </form>
+
+                <div id="tarjeta-liquidacion" class="card liquidacion oculto">
+                    <div class="card-header">
+                        <h2>Liquidación</h2>
+                        <span id="liq-tipo" class="badge"></span>
+                    </div>
+                    <div class="liq-placa mono" id="liq-placa"></div>
+                    <dl class="liq-detalle">
+                        <dt>Hora de ingreso</dt><dd class="mono" id="liq-ingreso"></dd>
+                        <dt>Tiempo transcurrido</dt><dd class="mono" id="liq-tiempo"></dd>
+                        <dt>Horas a cobrar</dt><dd class="mono" id="liq-horas"></dd>
+                        <dt>Valor por hora</dt><dd class="mono" id="liq-valor-hora"></dd>
+                    </dl>
+                    <div class="liq-total">
+                        <span>Total a pagar</span>
+                        <strong class="mono" id="liq-total"></strong>
+                    </div>
+                    <div class="acciones">
+                        <button id="btn-cancelar-cobro" type="button" class="btn btn-fantasma">Cancelar</button>
+                        <button id="btn-confirmar-pago" type="button" class="btn btn-primario">Confirmar pago</button>
+                    </div>
+                </div>
+
+                <div id="liquidacion-vacia" class="card card-vacia">
+                    <p class="texto-secundario">La tarjeta de liquidación aparecerá aquí.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ P-03: DASHBOARD CONSOLIDADO DE CAJA (solo ADMIN) ============ -->
+        <section id="panel-caja" class="panel oculto">
+            <div class="card filtros no-imprimir">
+                <div class="filtro">
+                    <label for="filtro-fecha">Fecha</label>
+                    <input id="filtro-fecha" type="date">
+                </div>
+                <div class="filtro">
+                    <label for="filtro-operario">Operario</label>
+                    <select id="filtro-operario">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+                <div class="filtro-acciones">
+                    <button id="btn-consultar-caja" class="btn btn-primario">Consultar</button>
+                    <button id="btn-exportar-csv" class="btn btn-secundario">Exportar CSV</button>
+                    <button id="btn-imprimir" class="btn btn-secundario">Imprimir cierre</button>
+                </div>
+            </div>
+
+            <h2 class="titulo-impresion">Cierre de caja · <span id="titulo-fecha"></span></h2>
+
+            <div class="kpis">
+                <div class="kpi kpi-principal">
+                    <span class="kpi-titulo">Total recaudado</span>
+                    <span class="kpi-valor mono" id="kpi-total">$0</span>
+                </div>
+                <div class="kpi">
+                    <span class="kpi-titulo">Subtotal carros</span>
+                    <span class="kpi-valor mono" id="kpi-carros">$0</span>
+                </div>
+                <div class="kpi">
+                    <span class="kpi-titulo">Subtotal motos</span>
+                    <span class="kpi-valor mono" id="kpi-motos">$0</span>
+                </div>
+                <div class="kpi">
+                    <span class="kpi-titulo">Tickets cerrados</span>
+                    <span class="kpi-valor mono" id="kpi-cantidad">0</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Movimientos del día</h2>
+                <div class="tabla-scroll">
+                    <table>
+                        <thead>
+                        <tr><th>#</th><th>Placa</th><th>Tipo</th><th>Ingreso</th><th>Salida</th><th>Operario</th><th class="der">Valor</th></tr>
+                        </thead>
+                        <tbody id="tabla-caja">
+                        <tr><td colspan="7" class="vacio">Sin movimientos</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- Contenedor de notificaciones tipo toast -->
+<div id="toasts" class="toasts"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
