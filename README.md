@@ -56,5 +56,3 @@ com.parktech
 - **RN-02:** una placa con ticket `ADENTRO` no puede volver a ingresar (HTTP 409).
 - **Placa:** carro solo `ABC-123`; moto `ABC-12D` (formato moderno) o `ABC-123` (formato anterior); se normaliza siempre con guion.
 
-> Nota académica: la contraseña se guarda en texto plano y el control de roles se hace en el frontend
-> para mantener el proyecto sencillo. En producción se usaría cifrado (BCrypt) y Spring Security.
